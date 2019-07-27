@@ -1,0 +1,10 @@
+1. git clone [URL]
+2. git fetch
+3. git merge
+4. cd [__파일명__]
+5. git status //올릴만한거 로컬에서 찾음
+6. git add -A //추가
+7. git commit -m "asd" //올릴떄 메모
+8. git push //바로 올립니다. 
+
+내 git에 올리려면?
