@@ -1,0 +1,500 @@
+1. Groupby를 진행할게요
+- (sex/age)모으고, 그 다음에 집계 함수(count/sum 등)
+- 다른 의미로 스플릿하고 집계함수 하는 식 
+- 그룹바이가 하나씩 돌아가면서 그 데이터 하나씩 나눠서 시군구로 자르고, 강남구 만큼 카운트. 강동구 만큼 카운트. 그걸 어플라이.
+
+2. 최종적으로 각각 합쳐서 한번서 보여주는걸 ?
+-컴바인
+
+3.  구룹바이 숨어있는 기법?
+- sac 기법
+
+4. 스플릿하고 카운트 하는 순간?
+- 어플라이 지원돼.
+
+5. 어플라이 지원되는 순간 컴바인 돼?
+-아니. 
+- 집계함수 하면 넌파이 특성상 리덕션이 되어서 어그리게이션(섬 카운트)에서, 굳이 컴바인 할 필요가 없어
+
+6. Grouper
+
+7. Counter
+- 그룹바이 자주하니까 반복되는거 중에 몇 개 있는지 알려주는거
+- from collections import Counter
+- Counter('aaaaabbbeee')
+>> Counter({'a': 5, 'b': 3, 'e': 2})
+
+8. Counter랑 유사한데 이쁜거(카운터는 딕셔너리 )
+- value_counts()
+- data['업종대분류'].value_counts()
+소매          34650
+생활서비스       25164
+학문/교육       19140
+음식          19080
+관광/여가/오락     9672
+부동산          6522
+숙박           5430
+스포츠          4092
+Name: 업종대분류, dtype: int64
+
+9. most_common 무슨 형식?
+- 딕셔너리 말고 리스트 형식
+
+10. 밸류 카운트?
+- 파이썬의 카운트 이용해서 만드는거
+- 우리 이거 생각 안나면 그냥 카운트 생각해서 쓰면 돼
+
+11. 소트 한 이후에 결과 안나온다
+- 뮤터블이다
+- x.most_common().sort() 
+
+12. sort() 도움말 보면 얜 무슨 기법? *있네
+- 키워드 기법
+- 그리고 INPLACE도 써있네
+
+13. 리스트 형태면 값으로도 보낼 수 있니?
+- 응
+- 소트에서 나옴. 갑으로도 나와
+-s=x.most_common()
+-s
+[('소매', 34650),
+ ('생활서비스', 25164),
+ ('학문/교육', 19140),
+ ('음식', 19080),
+ ('관광/여가/오락', 9672),
+ ('부동산', 6522),
+ ('숙박', 5430),
+ ('스포츠', 4092)]
+
+- s.sort(key=lambda t:t[1])
+-s
+[('스포츠', 4092),
+ ('숙박', 5430),
+ ('부동산', 6522),
+ ('관광/여가/오락', 9672),
+ ('음식', 19080),
+ ('학문/교육', 19140),
+ ('생활서비스', 25164),
+ ('소매', 34650)]
+
+14. #### value_counts()
+- 이뮤터블임. 시리즈 방식. 얘도 소트가 있음. 
+- 노말라이즈) 전체에 비율이 나타남.
+- 얘는 자유자재로 변경 못함. (파이썬은 가능함)
+
+- 파이썬의 카운트 이용한 것. 따라서 일반적인 카운트는 자유자재로 변경 가능함
+
+15. 밸류 카운트의  노말라이제이션?
+- 비율로 나타낼 수있음
+- ss=data['업종대분류']
+- ss.value_counts(True).plot.pie()
+- ss.value_counts(True,False).plot.bar()
+
+
+16. 그래프 모양 바꾸기
+- import matplotlib.pyplot as plt
+- plt.style.available
+- plt.style.use('ggplot')
+- ss.value_counts(True,False).plot.bar()
+	<- 아까랑 같은데 지지플랏 적용되서 배경 회색에 빨간 차트로 이쁘죠?
+	<- 우리 디쓰리 있는데 가시화에서 배워서 예쁘게 하는거 배울거야. D3. js
+
+17. DS.js
+- Data Driven Documents
+- 얘가 좀 빡센데 로우레벨까지 만들 수 있음
+- 시각화 예쁘게 차트 그리는거 (8월 14일) 
+
+18. 동시에 여러 카운트/평균/ 표준편차 하고 싶어 이때 사용하는거?
+- agg 및 aggregate(두개 다 같은거야)
+- 타이디 데이터면 그룹바이 가능
+- t=data[(data['광역시도']=='서울특별시' )& (data['업종대분류']=='부동산')].groupby('시군구')
+- import numpy as np
+- t.agg(['count','sum'])
+- t.agg(['count',np.std])
+
+19. transform?
+- 그룹바이했던걸 각각의 값으로 변경하는 것
+- t.transform('count')
+- t.transform('sum') //이건 에러
+
+20. 알아야 할 것 
+내부구조
+sac 기법
+집계함수
+어그리게이트로 2개이상 
+트렌스폼으로 각각의 값으로 변신가능
+
+21. # 파이썬에서 오아(OR)가 나오면 
+- 인 테크닉 사용
+- t=data[(data['광역시도']=='서울특별시')|(data['광역시도']=='강원도')& (data['업종대분류']=='부동산')].groupby('시군구') 대신
+- data['광역시도'].isin(['서울특별시','강원도'])
+
+
+
+22. 여러개 조건있을떄 사용?
+- 이즈 인
+- data.where(data['광역시도'].isin(['서울특별시','강원도']))
+인은 연산자고
+이스인은 함수
+
+23. 이즈는 무슨 함수?
+- 프레디케이트 함수로 트루 펄스 반
+
+24. 넌파이에도 ISIN 있나요?
+- 네
+- np.isin
+
+25. 판다스 접근2방식
+1. 넌파이
+- 대부분 넌파이 그대로 가져옴
+2. 분석 관점
+
+26. 판다스 이즈
+- 이즈
+-이즈 앤에이(=이즈 널)
+- 이즈 인
+
+
+27. na 아닌거 알고 싶을때(isna 반대)
+- data.notna()
+
+28. 그룹바이 3총사
+- 크로스테이블: 내가 원하는거 빨리 만들어줌
+- pd.crosstab(data['광역시도'],data['년'])
+- pd.crosstab(data['광역시도'],data['년'], data['수'], aggfunc='count')
+
+29. SCI
+- stack은 column을 index로 만드는거
+- 언스택은 인덱스를 컬럼으로 만드는것
+-data.groupby(['년','광역시도']).count().unstack()
+- 이거 어렵죠? 그래서지원하는게 크로스 탭 
+	- 그래프 그리기 좋아
+	- 크로스탭 
+
+30. 그룹바이 삼총사★★★★★
+- 1.그룹바이
+- 2.크로스탭
+- 3. 피봇테이블
+
+31. 피봇테이블 생성
+- 기본이 평균값
+data.pivot_table('수','년', aggfunc='count')
+
+32. pivot과 pivot_table 동일?
+- 다름
+
+33. 피봇테이블 언제 쓰면 좋아?
+- 부분합 할떄 사용ㅎ면 좋아(마진)
+
+34. 그래프 예쁘게 그리기
+-  ggplot은 그랜마 오브 그래픽으로 R 했죠 이쁘게?
+    - 그림 그리는 것을 문법화하여 자동적으로 그림 그리게 한 것
+- Vega
+    - 문법만 맞추면 이쁘게 그려줌
+    - 문법 모르면 도루묵.
+    - Visualization Grammar
+    - 그래프 문법 알면 간단하고 이쁘게 그릴 수 있어요
+- pdvega
+	- 문법 몰라도 괜찮아
+	- !pip install pdvega
+	- PNG로 익스포트 할 수 있음.
+
+35. 추천 시스템 종류 2가지
+- 협업 필터링(사람기반)
+- 콘탠츠 기반 필터링(과거 데이터 기반)
+
+36. Sernedipity
+- 신선한 추천
+- 나랑 유사한 사람이 나랑 같은거 다했는데, 하나만 달라. 그러면 그 안 한 한개를 추천해줄 수도 있지
+- 물건 파는 사람들이 좋아하고, 이게 대부분의 쇼핑몰에서 지원하는 추천방식이야
+
+37. 추천 시스템 문제점
+1. 콜드 스타트 문제
+2. 롱테일 문제
+3. gray sheep/black sheep 문제
+
+38. 콜드 스타트?
+- 힘들고 추운 상태에서 시작
+- 새로운 물건 대해 패턴 데이터가 없어. 그래서 성능 그닥
+
+39. 롱테일
+- 항상 사람들에 많이 팔린건 유사도 높아서 비대칭적 쏠림이 일반적.
+- 이거 해결하려고 했는데 20프로의 또 20프로에 쏠리는 식
+
+40. gray sheep/black sheep 
+- 독특한 일반적이지 않는 경우
+- 선호도가 이상한 사람. 왔다갔다 애매한 사람
+
+41. 콘텐츠 기반 필터링
+- 핵심) 내용에서 어떻게 유사도를 찾는가
+
+42. 하이브리드 시스템
+- 협업+ 콘텐츠 기반 
+
+43. 매트릭스
+- 가로:피쳐
+- 세로:벡터
+
+44. 사람끼리 유사도 찾는 방법
+- 코사인 시뮬러리티 (코사인을 이용하여 유사도 처리)
+	- 판례) 유사도 싹다 저렇게 해서 찾는거야.
+
+45. 아이템 베이스 콜라보레이트
+- 콘텐츠 속성 고려하지 않고
+- 사람들이 과거에 어떤거 했는지를 보고 유사도를 측정
+- 디비에 저장 하는등 하면서 캐시로 빠르게 사용 가능+ 선응도 좋았다. 
+
+46. 컨텐츠 베이스 콜라보레이티브
+- 메타데이터(콘텐츠 고유의 속성) 만으로 유사도 고려하여 테이블 생성
+
+47. 콜라보레이티브 차이
+1. 사람이 한 과거의 행동(아이템기반/유저기반)
+2. 컨텐츠 베이스는 행동과 상관없이 콘탠츠고유의 속성만 가지고 유사도를 계산
+
+
+48. 파일 불러오기
+- item= pd.read_csv('C:/Python/ml-100k/ml-100k/u.item', sep='|', header=None, engine='python', encoding='latin1')
+- 구분지을떄 sep 혹은 delimeter
+- u.data할때 \로 구분되는 경우
+	- data=pd.read_csv('C:/Python/ml-100k/ml-100k/u.data', engine='python', header=None, sep='\t')
+	- sep='\t'되야한댔어
+
+49. 불러온거 이름 변경
+- info.rename({1:'table', 0:'number'}, axis=1)
+
+50. # 우리는 추천 시스템 만들떄 처음에 할일?
+- 테이블 만들기
+- 테이블의 구성요소는 몇 개? 
+    - 왼쪽에 유저, 오른쪽에는 영화 제목, 그리고 가운데 값에는 영화 평점이 들어가야해
+    - 이런 정보 들어간 테이블이 data 테이블 
+        - user, item, rating있네요. 
+        - 이거 ㄹ이용하면 필요한 행렬 만들 수 있어
+ 
+51. userid를 왼쪽에 넘기는건?
+- 인덱스 
+
+52. 분리된 테이블(데이터프레임끼리 ) 조인하는거 이너조인?
+- merge
+
+53. 컬럼끼리 합칠ㄸ
+- 조인
+
+54. pd.to_datetime(data.timestamp)?
+- 시간 데이터 변경
+- timestamp는 1970년1월1일부터 플러스 일
+
+55. pd.to_datetime(data.timestamp, unit='s') 
+- 판다스 나노 세컨드인데, 이거 세컨드로 바꿨음
+
+56. 삼총사?~
+피봇은 어그리게이션 펑션이 아니야. 값을 그대로 박아
+
+57. 코릴레이션? 유사도 구하기
+- 컬럼끼리 관계
+- reco.T.corr()
+
+58. @@@@@@@@@@@@
+reco_corr.loc[42].sort_values(ascending=False)
+
+59. 재활용 리코멘데잇연
+- def recommendation_user(user_id, k):
+    return reco_corr.loc[user_id].sort_values(ascending=False)[1:k]
+- recommendation_user(1,5)
+
+60. 내가 본 영화 어떻게 거를까(나 42번이라할떄)
+-data[data.user_id==42].item_id
+
+61. 916번과 41번의 본 영화 차이
+- len(set(data[data.user_id==916].item_id)- set(data[data.user_id==42].item_id))
+
+62. # duplicate
+- 판다스는 중복 여부 알려주어 겹치는거 없애ㄴ는
+
+63. concat
+- s와 s1 테이블 붙이기
+- pd.concat([s,s1])
+
+64. 중복여부
+- x=pd.concat([s,s1]).duplicated()
+
+65. 중복 지우기
+- x.drop_duplicates(keep=False)
+
+# 인플레이스는 뮤터블 재할당하고 리턴해야해
+- 뮤터블은 리턴이 넌
+
+# 머지하려면 컬럼 이름이 같았어야해
+# rename (컬럼즈하면 액시스 안 써도되고, 컬럼즈 안쓰면 액시스 이꼴 1 써야해)
+
+66. 피클링
+- 객체 자체 저장- 텍스트가 아닌 객체 자체를 저장한다. 
+- 객체 자체 저장하는 방법?
+
+67. Persist
+- 지속 가능한. CS에서는 파일 저장 용어
+
+
+69. Flat file
+- 구조가 없음- txt나 csv처럼 보통 열리는 것처럼. 
+- 사람이 볼 수 있는 형태로 만들어진 텍스트 파일
+
+70. raw file
+- 구조가 있음
+
+71. 파일 구조
+- 경로+이름+확장자
+- 경로가 만일 없으면
+    - 1.경로)현재 작업하고 있는 파일과 동일한 위치에 있다는 것 
+        - 윈도우) 역슬러시,
+        - 리눅스 유닉스) \
+ #### 문제점) 파이썬은 어느 운영체제인지 상관없이 실행됨. 
+     - 파이썬 3.4부터 testlib 지원하여 같은 형태 사용해도 다양한 운영체제에서 사용할 수 있게 만들었음
+    - 2.이름)
+    - 3.확장자)
+
+72.운영체제마다 다른거 아는법?
+    - import platform
+    - 파이썬은 플랫폼 디팬던트 안하게 만드는 중 (자바처럼)
+    - 약간 플랫폼마다 차이가 있긴해 특히 파일 경로 설정하는 경우에
+
+73. 파이썬 open
+- 내부적으로 io 객체라는게 있음
+- 이 인풋 아웃풋 사이에 문을 연다는 개념.
+    - 그래서 쓰거나 읽거나 하는것
+
+74. 유닉스 리눅스 맥은 
+- utf-8, 
+
+#  utf-8은 에러날 수 있음
+- 파이썬 자체는 일반적으로 utf-8 기본
+
+75. 윈도우는 
+- cp949 일 수 있음.(내가 그럼)
+
+76. 한줄씩 불러들이기
+- file.readline() 
+- 이터레이터/제네리이터개념) 한줄씩 뽑아내요 메모리에서.
+- 'asd ffdasf\n' (끝에 \n)
+
+77. readline()
+- 맨 끝에 에러 안내고 공백 보여줌
+
+78. file.readlines() 
+-리스트니까 덧붙일 수 있네
+- 대신 얘는 리스트니까 next 안됩니다**
+- 모드가 쓰기가 아니면 덧붙일 수 없어요
+- 얘 next하니까 안돼 (아까 moon.txt는 dir해서 next 있길래 이터레이터로 next 했는데)
+
+79. 파일 쓰기모드 주의?-
+- close 안하면 작성한 내용이 파일에 반영 안되네요
+- 그래서 우리 배운거? with
+
+80. with 내부에 숨은ㅇ거?
+- enter exit
+
+###파이썬에는 사용이 끝난 메모리를 정리해주는 가비지 컬렉터가 있어서 파일을 닫지 않아도 가비지 컬렉터가 파일을 닫아줍니다. 하지만 프로그래머가 파일을 직접 닫아야 하는 이유는 다음과 같습니다.
+
+- 너무 많은 파일을 열어 두면 그만큼 메모리 공간을 차지하므로 성능에 영향을 줄 수 있습니다.
+- 파일을 닫지 않으면 데이터가 쓰기가 완료되지 않을 수도 있습니다. 운영체제는 파일을 처리할 때 성능을 위해서 데이터를 버퍼(임시 공간)에 저장한 뒤 파일에 씁니다. 때에 따라서는 파일이 닫히는 시점에 버퍼의 내용이 파일에 저장됩니다.
+- 이론적으로 운영체제에서 열 수 있는 파일의 개수는 한계가 있습니다.
+- 운영체제에 따라 파일을 열었을 때 파일을 잠금 상태로 처리하는 경우가 있습니다. 실질적으로 파일 처리가 끝났더라도 파일을 닫지 않으면 다른 프로그램에서 파일을 사용할 수 없는 상태가 됩니다.
+
+보통은 파일을 닫지 않아도 큰 문제가 없습니다. 하지만 실무에서는 사소한 실수로도 큰 문제가 발생하는 경우가 있으므로 파일을 정확히 닫는 습관을 기르는 것이 좋습니다.
+
+
+81. pickle
+- 객체 의미 가지며 저장
+- 파이썬 공식 라이브러리가 있음
+- name은 문자열, scres를 딕셔너리로 저장해본다고 해보자
+- 이걸 텍스트파일로 저장한다하면? 무조건 텍스트로 저장이 되긴해
+
+
+82. 피클 확장자
+- 안 중요
+
+83. 피클에서 b는 어떻게 저장?
+- 바이너리로. 우리 눈에 안보이게
+- dump load 쓰네 제이슨처럼
+- import pickle
+
+with open('moon.pickle', 'wb') as file:    # 확장자 마음대로
+    pickle.dump(name, file)
+    pickle.dump(scores, file)#dump는 제이슨에서 저장할때
+
+with open('moon.pickle', 'rb') as file:    #b는 바이너리라 우리 눈에 안보여
+    name = pickle.load(file)
+    scores = pickle.load(file)
+    print(name)
+    print(scores)
+
+
+84. 피클은 어떤 순서로 불러오나?
+- 순서별로 불러옵니다.
+- 한개만 불러올 수 있는데 약간 불편하네요
+
+86. 저장_피클
+import pickle
+ 
+name = 'Abder'
+website = 'http://abder.io'
+english_french = {'paper':'papier', 'pen':'stylo', 'car':'voiture'} # dictionary
+tup = (31,'abder',4.0) # tuple
+ 
+pickled_file = open('pickled_file.pickle', 'wb')
+pickle.dump(name, pickled_file)# 저장시키는 방법이 있어 
+pickle.dump(website, pickled_file)
+pickle.dump(english_french, pickled_file)
+pickle.dump(tup, pickled_file)
+
+87. 피클러
+- 클래스 방식으로 사용
+- 인스턴스 하는것도 맞아요
+- 순서에 조금더 유연할 수 있어요. 
+
+from pickle import Pickler
+ 
+name = 'Abder'
+website = 'http://abder.io'
+english_french = {'paper':'papier', 'pen':'stylo', 'car':'voiture'} # dictionary
+tup = (31,'abder',4.0) # tuple
+ 
+pickled_file = open('pickled_file.pickle', 'wb')
+p = Pickler(pickled_file)
+p.dump(name); p.dump(website); p.dump(english_french); p.dump(tup)
+
+88. 언피클러
+from pickle import Unpickler
+ 
+pickled_file = open('pickled_file.pickle', 'rb')
+u = Unpickler(pickled_file)
+name = u.load(); website = u.load(); english_french = u.load(); tup = u.load()
+ 
+print('Name: ')
+print(name)
+print('Website:')
+print(website)
+print('English to French:')
+print(english_french)
+print('Tuple data:')
+print(tup)
+
+# 각 커다란 프레임워크는 자기만의 피클링 방식 지원
+#### 경로 안 적혀있으면 현재 작업중인 디렉토리에 저장
+- 확장자에 뭐라고 적혀있어요? 
+    - npy
+- 확장자 안 써도 불러줌
+
+
+### x=np.s하면 
+- savetxt
+- savez 등 나오는데
+- savetxt는 아무의미없지만 savez는 집! 압축
+
+
+#### 다른 쥬피터 파일 열고 하려고 하면
+- x=np.load('npaaaa') 이거론 에러나
+- x=np.load('npaaaa.npy')해야지. 확장자까지 써야하니까
+
+
+
+

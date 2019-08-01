@@ -1,0 +1,8 @@
+def parseURL (seed):
+    html=download("get",seed)
+    dom=BeautifulSoup(html.text,"lxml")
+    
+    return [requests.compat.urljoin(url, _["href"]) for _ in dom.find_all("a") if _.has_attr("href") and len(_["href"])>3 ]
+#._has_attr("href")는 안 썼을 경우 아래의 코드에서 문제가 생길 수 있어
+# a 태그 밑의 href 찾는거라서. 
+# 길이 3이상인것: 길이 너무 짧은 내장형 # 주소같은거 걸러내려고

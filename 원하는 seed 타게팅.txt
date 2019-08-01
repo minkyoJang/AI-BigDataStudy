@@ -1,0 +1,11 @@
+url="https://www.google.com/search"
+param={
+                    "source":"hp",
+                    "ei":"4zUoXfDhGMiE8gXl3K2oDw",
+                    "q":"박보영",
+                    "oq":"박보영",
+                    "gs_l":"psy-ab.3..0l10.44389.45851..46019...1.0..1.128.895.8j1......0....1..gws-wiz.....0..0i10j0i131.UiEVgDQxvkA"
+                
+}
+html=download("get",url,param)
+dom=BeautifulSoup(html.text, "lxml")

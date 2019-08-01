@@ -1,0 +1,34 @@
+# 다운로드 함수
+import requests
+import requests
+import time
+import json
+import re
+from bs4 import BeautifulSoup
+url= "https://search.daum.net/search" #url은 상황에 맞게 작성
+headers={"user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"}
+def download(method, url, param=None, data=None):
+#없을 수도 있는 애들에 초기값 설정
+
+    try:
+        resp=requests.request(method, url,params=param,data=data, headers=headers)
+    #여기서 에러 난다면 어디서? 
+    #resp.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        print(e.code)
+        print(e.reason)
+
+    return resp
+==========================================
+# contenttype확인, 오케이인지, 어셉팅에 utf8인지 다른 인코딩인지
+# 이미 리퀘스트 사용해서 괜찮은데 urllib쓰면 다 바꿔야 한대@@
+=============================================
+< 긁어오는 식 예시>
+for href in [_.find_parent()["href"] for _ in dom.select(".LC20lb")]:
+[_["href"] for _ in dom.find_all("a")] 
+[_.find_parent()["href"] for _ in dom.select(".LC20lb")]
+[(_["href"], _.text) for _ in dom.select(".rc > .r a[href^=http]")]
+[_["href"] for _ in dom.select("a.sh_blog_title._sp_each_url._sp_each_title")]
+[ (_["href"], _.text) for _ in dom.select("div.news ul.type01>li a._sp_each_title")]
+[ _.text for _ in dom.select("div#newsColl div.cont_inner a.f_link_b")]
+[ (_["href"], _.text) for _ in dom.select("div#newsColl div.cont_inner a.f_link_b")]

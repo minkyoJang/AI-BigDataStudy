@@ -1,0 +1,174 @@
+-jmkDay21_pytorch-
+# 실습
+- !pip3 install torch torchvision
+- !ls #실제 배쉬에서 사용가능한거 나옴. 이게 매직코드. 
+>> sample_data
+
+- import torch
+- torch.cuda.is_available() #cpu 잘 돌아가는지보는코드
+>> True
+- a=torch.FloatTensor([[2,3,4,5]]) #토치 생성(어레이와 같은 방식)
+- a
+>> tensor([[2., 3., 4., 5.]])
+
+# view는 넌파이의 reshape와 같음
+- import numpy as np
+- b=np.array([[3,4,5,6]]) #넌파이와 같이 비교할게요
+- b.shape
+>> (1,4)
+- b.reshape(2,2)
+>> array([[3, 4],
+       [5, 6]])
+
+- a.view(2,2)
+>> tensor([[2., 3.],
+        [4., 5.]])
+
+- a.view(2,-1).flatten() #플랫된 벡터로  펼쳐짐
+>> tensor([2., 3., 4., 5.])
+
+# 스퀴즈 언스퀴즈
+- a.unsqueeze(1).shape #언스퀴즈. shape은 1,4인데 현재 1,1,4로 뭔가 끼어들어갔음
+>> torch.Size([1, 1, 4])
+
+- a.shape
+>> torch.Size([1, 4])
+
+- a.unsqueeze(1).squeeze(0)
+>> tensor([[2., 3., 4., 5.]])
+
+- a.unsqueeze(1).squeeze(0).shape #이렇게 다시 없앨 수 있음
+>> torch.Size([1, 4])
+
+#size통해 첫번째 디멘션의 크기가 몇인지 알 수 있음
+- a.size(0)
+
+# torch.cuda _중요한 메소드 잇어서 볼게요
+
+#cpu 사용 여부 체크
+print(torch.cuda.is_available())
+# 만일 사용이 가능하다면, 이 컴퓨터의 지피유 몇개가 가능한지
+print(torch.cuda.device_count())
+>>True
+>>1
+
+# torch.cuda 플롯 팬서
+# 지피유에 올라간 텐서생성
+##################실습################3
+- device=torch.device('cuda')
+- a=a.to(device)
+- a
+>> tensor([[2., 3., 4., 5.]], device='cuda:0')
+
+
+# !nvidia-smi실제 지피유 얼마나 사용하는지 확인
+- a=torch.cuda.FloatTensor(1024,1024,256) #256메가바이트
+- !nvidia-smi  #실제 지피유 얼마나 사용하는지 확인
+
+# 리니어 구현
+- linear=torch.nn.Linear(4,1) #input:4, output:1
+- x=torch.FloatTensor([0,1,1,1])
+
+# 리이어에 함수 형식으로 넣으면, 값이 이렇게 나와요. (tensor([-0.3247], grad_fn=<AddBackward0>))
+# 리니어 자체가 함수라서 linear. (점) 클릭하면 사용할 수 있는 값들이 나옴
+- linear(x)
+>> tensor([-0.3247], grad_fn=<AddBackward0>)
+
+#torch.nn.functional. 시그모이드나 소프트맥스 등. 액티베이션으로 시그모이드 및 소프트맥스 쓸 수 있는데 그게 여기에 있어요. 함수가 워낙 많아서 docs 볼게요
+
+- import torch.nn.functional as F #귀찮으니까 그냥 F로 부르게해
+- F.sigmoid(linear(x))
+>> /usr/local/lib/python3.6/dist-packages/torch/nn/functional.py:1386: UserWarning: nn.functional.sigmoid is deprecated. Use torch.sigmoid instead.
+  warnings.warn("nn.functional.sigmoid is deprecated. Use torch.sigmoid instead.")
+tensor([0.4195], grad_fn=<SigmoidBackward>)
+
+- F.tanh(linear(x))
+>> /usr/local/lib/python3.6/dist-packages/torch/nn/functional.py:1374: UserWarning: nn.functional.tanh is deprecated. Use torch.tanh instead.
+  warnings.warn("nn.functional.tanh is deprecated. Use torch.tanh instead.")
+tensor([-0.3137], grad_fn=<TanhBackward>)
+
+- F.sigmoid(linear(x))
+>> /usr/local/lib/python3.6/dist-packages/torch/nn/functional.py:1386: UserWarning: nn.functional.sigmoid is deprecated. Use torch.sigmoid instead.
+  warnings.warn("nn.functional.sigmoid is deprecated. Use torch.sigmoid instead.")
+tensor([0.4195], grad_fn=<SigmoidBackward>)
+
+- torch.sigmoid(linear(x))
+>> tensor([0.4195], grad_fn=<SigmoidBackward>)
+
+# ADAM- 90프로가 사용함. (option)그리고 여기서 옵션 쓰곤함
+==============================================
+
+####MODEL은 클래스 형식으로 정의
+- n드. 클래스 정의 할 때 이 함수가 호출 되는 식으로 필수적으로 구현되어야 함. 
+-  self.(점)으로 하고
+
+
+- relu라는 액티베이션을 통해 계산. 
+- forward 함수도 필수적으로 구현이 되어야 하며 이건 내가 사용하는 학습되어야 할 데이터 대한 것
+- 즉 ** __init__ 및 forward는 모델에서 꼭 구현이 되어야 함
+
+
+#### Training Model
+- 인풋 디맨젼 8, 히든 디맨전 128 지정하여 모델 생성 (단 초반에는 리니어에 있는 가중치 랜덤 초기화)
+- model.parameters()
+- lr: 러닝 메이트 (10의 -3승을 넣게 되어요)
+- criterion: MSELose를여기에서 하고
+- model.train() : 학습모드라고 말해주고
+- epochs : 
+
+- 포문: 여러번 학습시켜요(매 학습마다 데이터 순서는 랜덤하게 바꿔줘야해요 ** 딥러닝 성능이 좋다보니 저 순서를 고정해버리면 순서 자체를 외울 수 있음. 따라서 랜덤하게 바꾸며 학습하게 됨)
+
+- batch: 예,20개씩 한번에 넣어서 학습하는 식. 하나씩 넣게 되면 너무 속도가 느려서.
+    - 각각에 대해 평균을 내서 그거에 대한 프로포게이션
+    - gpu 메모리에 복사를 하게 되면 20장에 대해 모델에 넣게 되고, 
+    
+ - 로스 함수 계산; 20개, 타겟 20개에 대한 민ㅅ퀘어 계산을 하래. 그래서 백워드를 쭉 하면 레이어1,2,3별로 계싼이 되어요. 백워드하면 그ㅐ디언튿르이 각각 생김
+ 
+ - 옵티마이저.스탭) ㄱㄱ각 레이어 들이 각각 그래디언트를 가지고 업데이트를 하게 됩니다. 
+ 
+ - 이 과정 반복하면 모델의 성능이 조아져요
+ - 옵티마이점 제로 그래드는
+    - 백워드 한번하면 그래디언트 계싼되는데 또 백워드를 하면 그래디언트가 플러스가 됨. 이전 계산에 지금 계산 추가되어 누적되니, 이전 계싼은 날려버리곘다는 뜻.
+    
+    
+    
+    #### Testing Model
+    - 우선 그래디언트 계산할 필요 없음
+        - torch.no_grad로 계산 안하겠다 하여 지피유 메모리 적게 쓰게 함
+        - model. eval() : 평가 모드로 하겠다. 
+            - 나중에 드랍아웃 및 기타 랜더마이즈한 기법 적용시 학습에서 사용하다가 평가할때는 랜덤하게 사용하겠다 그렇게 고정하겠따는건데 일단 무시(''//'')
+         - 아까는 MSE에러였는데 이제는 loss . 
+           - 즉 |0.8-1| 로 0.2만큼 차이 있는거 직관적으로 알 수 있게끔. 
+           - 다 더하고 평균내서 토탈 로스로 출력한다고 보시면 됩니다.n.Module: 최상위 부모 클래스
+- __init__ : 스페셜 메소드
+
+
+#### LOAD and Save Mode
+- torch.save()
+    - 이 함수로 저장
+    - 모델 자체를 넣지 않고, 모델의 상태를 불러와서 저장하게 됨
+    - torh.save(the_model.state_dict(), PATH)
+        - 상태) 이런 모델의 상태값 저장을 하고 모델 자체를 저장해도 되나 권장하는 것은 상태저장
+        - 그래야 변형시 유연함
+- 
+
+##### the_model+THeModelClass(*args, **kwargs)
+- the_model.load_state_dict(torch.load(PATH))
+
+    - 파일에서 모델을 불러오는 경우.
+    - 클래스로 정의했기에 실제 객체로 만들어줘야해요. 
+    - 만들지 않고 하면 모델이 없는 채에서 함수 사용하는 식이라 에러 생길 수 있음
+
+
+-=======사이킷런(캘리포니아 집값 딥러닝 실습)======
+# 정규화 하는 이유
+- 안정적으로 만들기 위함
+
+
+-----------------------------
+Xtrain, Xtest, Ytrain, Ytest 이해
+- 만일 키를 통해 몸무게를 추측한다고 합시다
+- 키에 대한 데이터 172, 180cm등은 Xtrain이고, 178일때의 결과를 얻고 싶은 Xtest라하면
+- 몸무게(결과 예측)에 대한 데이터는 62, 65kg이 ytain이고, 값이 나왔어야 하는 결과값 70은 ytest
+- 이때 ytest와 ytrain에 대한 차이가 loss
+- 에폭: 데이터 넣고 돌리는 한 세트

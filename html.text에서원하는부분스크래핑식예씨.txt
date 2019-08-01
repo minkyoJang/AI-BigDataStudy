@@ -1,0 +1,48 @@
+< 긁어오는 식 예시>
+for href in [_.find_parent()["href"] for _ in dom.select(".LC20lb")]:
+[_["href"] for _ in dom.find_all("a")] 
+[_.find_parent()["href"] for _ in dom.select(".LC20lb")]
+[(_["href"], _.text) for _ in dom.select(".rc > .r a[href^=http]")]
+[_["href"] for _ in dom.select("a.sh_blog_title._sp_each_url._sp_each_title")]
+[ (_["href"], _.text) for _ in dom.select("div.news ul.type01>li a._sp_each_title")]
+[ _.text for _ in dom.select("div#newsColl div.cont_inner a.f_link_b")]
+[ (_["href"], _.text) for _ in dom.select("div#newsColl div.cont_inner a.f_link_b")]
+
+
+for tr in dom.select("tr[class^=list]")[1:]: #tr이 list0, list1이 반복되고 있어서, 이렇게 시작되는 애들 중에서 고르려고 한 듯. 첫줄은 설명 공지사항이라 빼고 
+    td= tr.find_all("td", recursive=False)# recursive=False: tr 바로 밑에있는 자식 td만 건들이겠다는 뜻!!
+    print(requests.compat.urljoin(url, td[3].a.img["src"]))# urljoin은 상대주소를 절대주소로 바꾸니까 도메인과 url 합침 **
+    print(td[3].select("td[valign=middle] > a")[0].text) #에이가 글에/그림에 있었어
+    temp=td[5].text.split("-") # 추천 비추천 안 나는애 대하려고. 스플릿해서 길이가 0,1인애 등이 있었어요. 그래서 없는애는 무시하고
+    print((0,0) if len(temp)<2 else ",".join(temp)) #추천 비추천 고루 있는 애만 긁어오게 했어요. 
+    print(td[6].text.strip())
+    print()
+=============================================
+for _ in html.json()["records"]:
+    print(_["country"])
+------------------------------------------------------------------------------------------------------------------
+SELENIUM
+for _ in driver.find_elements_by_css_selector("strong.mail_title"):
+                                            print("[CSS]",_.text)
+
+for cookie in driver.get_cookies():
+    print(cookie["name"], cookie["value"]) ##이름이 'name'과 'value'인거 어디서 확인
+
+for _ in driver.find_elements_by_xpath("//div[@class='user_mycafe_list']//div[@class='user_mycafe_info']/a/strong[@class='name']"):
+    print(_.text)
+
+for _ in driver.find_elements_by_xpath("//div[@class='user_mycafe_list']//div[@class='user_mycafe_info']/a/strong[@class='name']"):
+    print(_.text)
+
+driver.get("https://nid.naver.com/nidlogin.login?mode=form&url=https%3A%2F%2Fwww.naver.com") #로그인
+driver.find_element_by_name("id").send_keys(account["id"])
+driver.find_element_by_id("pw").send_keys(account["pw"])
+driver.find_element_by_xpath("//input[@class='btn_global']").click()
+driver.find_element_by_css_selector("#results").text 
+---------------------------------------------------------------------------------------------------------------------
+(_["href"], _.text) for _ in dom.select("")
+ for _ in driver.find_elements_by_xpath("//div[@class='main_component']:
+	print(_.text, _["href"])
+
+//div[@class='user_mycafe_info']/a/strong[@class='name']"):
+    print(_.text)

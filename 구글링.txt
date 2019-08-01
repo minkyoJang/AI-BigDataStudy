@@ -1,0 +1,27 @@
+#잘정의하면계속쓸 download함수
+import requests
+import requests
+import time
+import json
+import re
+from bs4 import BeautifulSoup
+url= "http://example.webscraping.com/places/default/index" #url은 상황에 맞게 작성
+headers={"user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"}
+def download(method, url, param=None, data=None):
+#없을 수도 있는 애들에 초기값 설정
+
+    try:
+        resp=requests.request(method, url,params=param,data=data, headers=headers)
+    #여기서 에러 난다면 어디서? 
+    #resp.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        print(e.code)
+        print(e.reason)
+
+    return resp
+
+
+#download("get", url)
+#headers=None
+#html=download("get",url)
+#html.request.headers

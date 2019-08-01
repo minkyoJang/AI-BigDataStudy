@@ -1,0 +1,713 @@
+1. 시간 날짜 변경할떄
+	- pd.to_datetime
+
+2. 국제 년/월/일 국제표준
+- 시간 날짜 표현할떄 yyyy-mm-dd
+- 이건 외부 프레임워크 잘 받아들임
+
+3. #### 이 날짜 넣어둔 temp의 타입은 뭘까?
+- 시리즈
+239   2017-12-21
+240   2017-12-22
+241   2017-12-23
+242   2017-12-24
+243   2017-12-25
+244   2017-12-26
+245   2017-12-27
+246   2017-12-28
+247   2017-12-29
+248   2017-12-30
+249   2017-12-31
+
+4. 안에 넣은게 데이트 타입이면 뭘 넣을 수 있냐면
+    - resample
+
+5. 리샘플?
+        - 시간날짜 간격에 따라서 합칠 수 있음
+
+# 리셈플 유무는 타입 속성 따라 달라
+        - dust['날짜'].resample('D') 하면 타입 에러 나
+            - 일단 현재는 속성이 시리즈임 type(temp) 보면 알 듯이 
+
+6. dateutil
+- 시간날짜 문자를 변환해줘(한글은 안됨)
+- 자동으로 파싱해서 날짜로 만들어줘.
+- from dateutil import parser
+- date = parser.parse("4th of July, 2015")
+>> datetime.datetime(2015, 7, 4, 0, 0)
+
+7. strptime, strftime 차이
+- strftime: 시간날짜 객체를 스트링으로 변경
+	- a.strftime('%A')
+		-'Monday'
+- strptime: 스트링으로부터 시간날짜 객체를 반환
+	- 즉 파서와 유사함
+
+-from dateutil import parser
+- date = parser.parse("4th of July, 2015")
+- date
+>> datetime.datetime(2015, 7, 4, 0, 0)
+
+8. dateutil : 얘는 strptime보다 더 잘 돼 
+	- 근데 년/월/일은 잘 안 돼
+	- 국제 표준에서는 괜찮
+9. to_datetime
+- 문자열에서 시간 날짜로 변경
+	-내부적으로 dateutil 사용
+
+# 자동적으로 파싱 되는데 타입하면 이상해
+- import pandas as pd
+- date = pd.to_datetime("7 30 2018")
+- date
+> Timestamp('2018-07-30 00:00:00')
+
+#자동적으로 파싱 되는데 타입하면 이상해
+- type(date)
+> pandas._libs.tslibs.timestamps.Timestamp
+	>> 아까 타입해서는 시리즈였는데 지금은 타임스탬프가 나왔네
+
+10. 타임스탬프?
+- 파이썬의 데이트타임을 가지고 와서 상속했어 판다스
+- 그래서 하나씩 조작을 할때 파이썬 문법을 사용해야함
+
+11. 타입해서 언제 타임스탬프? 언제 시리즈?
+# 한개 반환) 타임스탬프
+# 여러개 반환) 시리즈
+
+12. pd.to_datetime
+- 데이터를 한개 넣었을떄 여러개넣었을때 결과물이 달라
+-즉! 시리즈 넣으면 시리즈,
+- 하나 넣으면 타임스탬프(= 파이썬 타임데이트와 같음),
+- 한개도 시리즈도 아닌애 넣었더니 데이트타임 인덱스
+
+- t= pd.to_datetime(['2014-07-04', '2014-08-04',
+                          '2015-07-04', '2015-08-04'])
+- type(t)
+>> pandas.core.indexes.datetimes.DatetimeIndex
+
+13. 그림그리려면 임포트 해야하는
+- %matplotlib inline
+
+14. date_range()
+- 시간을 자동으로 만들어줌
+- 옵션이 많음
+- index= pd.date_range('1/1/2000', periods=9, freq='T')
+- series= pd.Series(range(9), index=index)
+- series
+>>>
+2000-01-01 00:00:00    0
+2000-01-01 00:01:00    1
+2000-01-01 00:02:00    2
+2000-01-01 00:03:00    3
+2000-01-01 00:04:00    4
+2000-01-01 00:05:00    5
+2000-01-01 00:06:00    6
+2000-01-01 00:07:00    7
+2000-01-01 00:08:00    8
+Freq: T, dtype: int64
+
+
+
+15. #### 시리지의 ~가 ~면 resample 사용가능 @@@@@@
+- 리샘플 하려면 인덱스가 '데이트타임 인덱스' 여야 한다 혹은 뭐시기 뭐시기 있어
+
+16. #### 리샘플?
+- dust['2017-03']
+-  리샘플 하려면 인덱스가 '데이트타임 인덱스' 여야 한다 혹은 뭐시기 뭐시기 있어
+- 리샘플 뒤에 집계함수 있어야 함
+
+17. ### 교수님 정리
+- 판다스는 넌파이 가져왔는데
+- 판다스는 데이트 타임에 관련해서는 파이썬에서 가지고 왔어요 
+    - 그중  아까 넌파이 편한기능 가져와서 합쳐 쓸 수 있게했고
+    - 그 이름도 넌파이에서 가지고 왔대요
+- 넌파이는 국제 표준만 2017-01-02 이런식만 파싱 가능
+- import numpy as np
+- date=np.array('2015-07-04', dtype=np.datetime64)
+- date
+>> array('2015-07-04', dtype='datetime64[D]')
+
+- date+np.arange(12)
+>> array(['2015-07-04', '2015-07-05', '2015-07-06', '2015-07-07',
+       '2015-07-08', '2015-07-09', '2015-07-10', '2015-07-11',
+       '2015-07-12', '2015-07-13', '2015-07-14', '2015-07-15'],
+      dtype='datetime64[D]')
+
+
+
+t= pd.to_datetime(['2014-07-04', '2014-08-04',
+                          '2015-07-04', '2015-08-04'])
+type(t)
+
+index = pd.DatetimeIndex(['2014-07-04', '2014-08-04',
+                          '2015-07-04', '2015-08-04'])
+data = pd.Series([0, 1, 2, 3], index=t)
+
+data.loc['2014-07']
+
+18. to_datetime
+- 파이썬 기반
+- 파이썬에서 쉽게 변해주는게 데이트 유틸리티
+- 그걸 피디점 투데이트타임에서 구현했음
+- 그래서 저 아래에 이상한 것들. 국제 표준 아닌 것들도 다 파싱할 수 있음 4th of July, 2015',
+- 그래서 에러가 안생김(넌파이였으면 생겼을거야)
+
+19. to_datetime 이름은 어디서 따옴?
+-  넌파이따왔음(0000-00-00)
+- DatetimeIndex(['2015-07-03', '2015-07-04', '2015-07-06', '2015-07-07',
+               '2015-07-08'],
+              dtype='datetime64[ns]', freq=None)
+
+20. to_period
+
+-  기간 / 시각
+- 얘는 빈도가 적혀있음
+- dates.to_period('H')
+    - PeriodIndex(['2015-07-03 00:00', '2015-07-04 00:00', '2015-07-06 00:00',
+             '2015-07-07 00:00', '2015-07-08 00:00'],
+            dtype='period[H]', freq='H')
+- 그런데 to~index는 빈도가 안 적혀있을거야 
+
+21. Timedelta
+- 파이썬은 한개만
+- 판다스는 넌파이처럼 벡터라이즈 지원해서 동시에 여러개 계산 가능
+
+22. Time delta_range
+- 자동으로 구간을 만들어줌
+
+23. Period_range
+- 자동으로 구간 만들어줌
+
+24. Propeht
+- facebook
+- 가장 유명한게 파이토치. 딥러닝(페이스북 공개)
+- 프로핏이 현재 나온 시계열 알고리즘중에 좋고 사용이 편함
+- R, python지원(더 협소하게는 판다스 지원)
+
+25. fb prophet 뭐위해 사용?
+- 예측분석 
+- 보통 R 기반
+- Propeht
+    - 예측분석에서 유명한 사이킥과 완전 똑같이 사용될 수있음
+    - 설치 잘 안돼 종속성 때문
+- facebook 지원. 
+
+
+
+26. 설치
+- !pip install fbprophet
+
+27. #### 설치문제
+- 공식사이트에 보면 설치하는 방법이 적혀있음.
+- 우리는 아나콘다 사용하니까 그 방식 이용해서 설치해볼게요
+- 아나콘다프롬프트 관리자 권한으로 열고
+    - conda install gcc
+    - y
+    - conda install -c conda-forge fbprophet.
+        - 느리게 다운 받아지는듯하면 눌러서 ?! 진행되게
+from fbprophet import Prophet
+data=pd.read_csv('https://raw.githubusercontent.com/facebook/prophet/master/examples/example_wp_log_peyton_manning.csv')
+m=Prophet()
+
+28. 최적화
+- m.fit(data)
+- vars(data)
+
+29. fbplot
+1. 임포트 -클래스 임포트
+- from fbprophet import Prophet
+- data=pd.read_csv('https://raw.githubusercontent.com/facebook/prophet/master/examples/example_wp_log_peyton_manning.csv')
+2. 인스턴스화
+- m=Prophet() #인스턴스화 . 클래스이고 인스턴스화를 해서 사용행햐ㅐ
+3. fit해서 최적화한다.
+- m.fit(data)
+- f=m.make_future_dataframe(periods=365)
+- f
+
+4. 프레딕트
+- m.predict(f)
+- 원하는거만 보려면 팬시인댁싱
+- m.predict(f)[['ds','yhat','yhat_lower','yhat_upper']]
+ 혹은
+- forecast=m.predict(f)
+- forecast[['ds','yhat','yhat_lower','yhat_upper']]
+
+5. 결과는 
+- 플랏으로 보거나/플랏.component
+- m.plot(forecast)
+- m.plot_components(forecast)
+--------------------
+<fbprophet>
+- import pandas as pd
+- dust= pd.read_csv('C:/Python/dust/dust.csv',engine= 'python', encoding='cp949')
+- dust
+- dust.info()
+- pd.to_datetime(dust['날짜'])
+- dust['날짜'] = pd.to_datetime(dust['날짜'])
+- dust #레인지 인덱스라 리샘플 안됨
+- dust['날짜'].resample 
+- type(temp)
+
+## dateutil
+- 시간날짜 문자를 변환해줘(한글은 안됨)
+- 자동으로 파싱해서 날짜로 만들어줘.
+- from dateutil import parser
+- date = parser.parse("4th of July, 2015")
+>> datetime.datetime(2015, 7, 4, 0, 0)
+
+### trptime, strftime 차이
+- strftime: 시간날짜 객체를 스트링으로 변경
+	- a.strftime('%A')
+		-'Monday'
+- strptime: 스트링으로부터 시간날짜 객체를 반환
+	- 즉 파서와 유사함
+
+-from dateutil import parser
+- date = parser.parse("4th of July, 2015")
+- date
+>> datetime.datetime(2015, 7, 4, 0, 0)
+
+8. dateutil : 얘는 strptime보다 더 잘 돼 
+	- 근데 년/월/일은 잘 안 돼
+	- 국제 표준에서는 괜찮
+9. to_datetime
+- 문자열에서 시간 날짜로 변경
+	-내부적으로 dateutil 사용
+
+# 자동적으로 파싱 되는데 타입하면 이상해
+- import pandas as pd
+- date = pd.to_datetime("7 30 2018")
+- date
+> Timestamp('2018-07-30 00:00:00')
+
+#자동적으로 파싱 되는데 타입하면 이상해
+- type(date)
+> pandas._libs.tslibs.timestamps.Timestamp
+	>> 아까 타입해서는 시리즈였는데 지금은 타임스탬프가 나왔네
+
+10. 타임스탬프?
+- 파이썬의 데이트타임을 가지고 와서 상속했어 판다스
+- 그래서 하나씩 조작을 할때 파이썬 문법을 사용해야함
+
+11. 타입해서 언제 타임스탬프? 언제 시리즈?
+
+##  pd.to_datetime
+- 데이터를 한개 넣었을떄 여러개넣었을때 결과물이 달라
+- 즉! 시리즈 넣으면 시리즈,하나 넣으면 타임스탬프(= 파이썬 타임데이트와 같음),한개도 시리즈도 아닌애 넣었더니 데이트타임 인덱스 ★
+
+- t= pd.to_datetime(['2014-07-04', '2014-08-04',
+                          '2015-07-04', '2015-08-04'])
+- type(t)
+>> pandas.core.indexes.datetimes.DatetimeIndex
+
+
+### 한개 반환) 타임스탬프★
+### 여러개 반환) 시리즈★
+### 한개도 여러개도 아닌경우) 데이트 타임 인덱스★
+
+# 그래프
+- %matplotlib inline
+- dust.plot.line()
+
+
+# 리샘플
+- dust['2017-03']
+-  리샘플 하려면 인덱스가 '데이트타임 인덱스' 여야 한다 혹은 뭐시기 뭐시기 있어
+- 리샘플 뒤에 집계함수 있어야 함
+
+t= pd.to_datetime(['2014-07-04', '2014-08-04',
+                          '2015-07-04', '2015-08-04'])
+
+type(t)
+
+
+index = pd.DatetimeIndex(['2014-07-04', '2014-08-04',
+                          '2015-07-04', '2015-08-04'])
+
+data = pd.Series([0, 1, 2, 3], index=t)
+#### 셋인덱스 하고 나니까 되는거래
+dust.setindex('날짜', inplace=True) #
+dust['2017-03'] #뀨 안 되었었음
+
+## 교수님 정리
+- 판다스는 넌파이 가져왔는데
+- 판다스는 데이트 타임에 관련해서는 파이썬에서 가지고 왔어요 
+    - 그중  아까 넌파이 편한기능 가져와서 합쳐 쓸 수 있게했고
+    - 그 이름도 넌파이에서 가지고 왔대요\
+- 넌파이는 국제 표준만 2017-01-02 이런식만 파싱 가능
+
+
+## fb prophet★★★★★★★★★★
+# 시계열 분석한다 할때 이거로 돼.
+- 최신
+#### 예측 분석
+- 보통 R 기반으로 사용함
+- Propeht"
+    - 예측분석에서 유명한 사이킥과 완전 똑같이 사용될 수있음
+        - 설치 잘 안돼 종속성 때문
+            - 아나콘다. 의존성 관리하기에 시간이 오래걸려요. pip는 의존성 관리 안해서 이거 까는 순간 다른게 안 될 수있어요.
+- facebook 지원. 
+- 가장 유명한게 파이토치. 딥러닝(페이스북 공개)
+- 프로핏이 현재 나온 시계열 알고리즘중에 좋고 사용이 편함
+- R, python지원(더 협소하게는 판다스 지원)
+
+-------------
+!pip install fbprophet
+
+#### 설치문제
+- 공식사이트에 보면 설치하는 방법이 적혀있음.
+- 우리는 아나콘다 사용하니까 그 방식 이용해서 설치해볼게요
+- 아나콘다프롬프트 관리자 권한으로 열고
+    - conda install gcc
+    - y
+    - conda install -c conda-forge fbprophet.
+        - 느리게 다운 받아지는듯하면 눌러서 ?! 진행되게
+
+- from fbprophet import Prophet
+- data=pd.read_csv('https://raw.githubusercontent.com/facebook/prophet/master/examples/example_wp_log_peyton_manning.csv')
+- m=Prophet() #인스턴스화 . 클래스이고 인스턴스화를 해서 사용행햐ㅐ
+- m.fit(data)
+- vars(data)
+
+#데이터 프레임 생성
+- f=m.make_future_dataframe(periods=365)
+- f
+
+### 팬시 인덱싱으로 필요한 값
+- yhat: 예측값
+    - 이거 회사임
+
+- forecast=m.predict(f)
+- forecast[['ds','yhat','yhat_lower','yhat_upper']]
+- m.plot(forecast)
+- m.plot_components(forecast)
+
+###  fbprophet 5줄이면 끝나요
+-1. 데이터임포트
+-2. 
+-3. 
+-4. 
+-5. 그래프 가시화
+	- plot,plot_components
+	>> m.plot(forecast)
+	>>m.plot_components(forecast)
+
+
+
+#### plotly
+- 아주예쁘고 좋은데
+- 얘는 비싸
+    - from fbprophet.plot import plotly
+
+
+--------------------
+50.  위치기반
+- 사용하는건 folium
+- !pip install folium
+- import folium
+-
+- m=folium.Map(location=[37.5665, 126.9780],zoom_start=15)
+
+51. zoom_start?
+- 지도상에서 어떻게 이느냐
+
+52.  location은?
+-  위도 경도
+
+53. 폴리엄은 시스템용?
+- 시스템 아니에요.
+- 보고서 용이에요. 
+
+54. 시스템적으로 하고 싶다면?
+- 구글 에이피아이 가져와야해
+
+55. ties?
+ - 조각조각 내서 가져오는데, 이 지도의 모양을 보여주는옵션 
+
+56. 마크?
+- 지도상에 박을 수 있고
+- add to로 지도상에 박을 수 있음(html코드)
+
+57. 마커
+- 누르면 탁 티어나오는 거
+- 써클 마커하고 서클하고 차이 있어요. 
+
+57. 주석 빨리 해제
+- 컨트롤 슬러쉬
+
+58. 위도 경도 (교수님 많이 사용하시는거)
+- m5 = folium.Map( location=[37.5665, 126.9780], tiles='Stamen Toner')
+- m5.add_child(folium.LatLngPopup())
+
+59.  ClickForMarker
+- 특정한 값 찍을떄 딱 팝업되게 코드 찍을 수 있어
+- 10개 데이터 받아서 찍거나
+- 이거로 10개의 점 찍어서 그 가운데 타게팅 간으
+
+60. 단계 구분도
+- 히트맵을 지도로 표현
+	- 성북구/강남구 이렇게 영역별로 구분지어 하는거
+- 판다스 연결해서 할 수 있어
+
+61. 제이슨 로드하면?
+- 딕셔너리 형식ㅇ로 바뀜
+
+62. 서울 지도
+- import json
+- seoul_topo_json = open('asset/seoul_municipalities_topo_simple.json', encoding='utf-8')
+- seoul_topo_json = json.load(seoul_topo_json)
+
+63. 서울지도에서 예쁘게 뽑기
+- from pprint import pprint
+- pprint(seoul_topo_json)
+
+64. 토포제이슨에서 강남구 정보 뽑기
+- seoul_topo_json['objects']['seoul_municipalities_geo']['geometries'][2]
+>>
+{'arcs': [[6, -6, 7, 8, 9, 10]],
+ 'type': 'Polygon',
+ 'properties': {'code': '11230',
+  'name': '강남구',
+  'name_eng': 'Gangnam-gu',
+  'base_year': '2013'}}
+
+65. arcs?
+- 강남구 영역을 벡터로 표현
+- 위치 뽑아냄
+
+66.지오제이슨에서 강남 뽑아보자
+- seoul_geo_json = open('asset/seoul_municipalities_geo_simple.json',encoding='utf-8')
+- seoul_geo_json = json.load(seoul_geo_json)
+- seoul_geo_json
+- seoul_geo_json['features'][2]
+>>
+{'type': 'Feature',
+ 'properties': {'code': '11230',
+  'name': '강남구',
+  'name_eng': 'Gangnam-gu',
+  'base_year': '2013'},
+ 'geometry': {'type': 'Polygon',
+  'coordinates': [[[127.05867359288398, 37.52629974922568],
+    [127.0690698130372, 37.522279423505026],
+    [127.06860425556381, 37.51812758676938],
+    [127.06926628842805, 37.51717796437217],
+    [127.0719146000724, 37.50224013587669],
+...
+
+67.  토포제이슨과 지오제이슨 있음. 
+- 이건 위치를 표현하는거
+- 둘다 벡터라서 확대해도 안 깨짐
+
+68. 지오제이슨
+- 위도 경도를 표현
+- 굉장히 많이 표현
+- 우리는 이거 사용
+
+69. 지오제이슨의 단점?
+- 파일 크기가 토포제이슨 4배만큼 커
+>>
+-m9 = folium.Map( location=[37.5665, 126.9780], tiles='Mapbox Bright') 
+
+#지오제이슨
+-folium.GeoJson(seoul_geo_json,name='geojson').add_to(m9)
+
+#토포제이슨
+-folium.TopoJson(seoul_topo_json,"objects.seoul_municipalities_geo",name='topojson').add_to(m9)
+-folium.LayerControl().add_to(m9) #레이어를 이용하여 add_to를 집어넣어요
+-m9
+
+
+70. 판다스 삼총사 많이 사용해보세요. 
+- 어플라이 맵- 맵
+
+71.맵
+- 브로드캐스팅으로 하면 상세 조건대로 해주기 힘드니 사용
+
+71.5 맵 어디서 사용?
+- 시리즈 및 데이터 프레임
+
+
+72. 맵 내부 3개
+- 함수/딕셔너리/시리즈
+    - 맵은 시리즈에서 하나씩 쓸 수 있어 포처럼 돌앋 ㅏ니면서
+
+73. 판다스 무슨 툴?
+- 랭그링
+- 가져와서 프리프로세싱하고 간단하게 그래프 그리는 툴
+- 분석하면 고급 분석 있어야 하는데 판다스에 없음
+- 그냥 어그리게이션 뿐이얌
+
+74. tips에서 성별 바꾸는 방식 2가지
+- tips.sex.map({'Male':1, 'Female':2})
+- tips.sex.map(lambda x: 1 if x=='Male' else 2)
+
+75. 어플라이
+- 어플라이에 잘 보니까 액시스 개념 있어요. ★***★
+- 맵은 시리즈에서 사용(시리즈+데이터 프레임)
+-  시리즈했을때 맵과 같고, 데이터 프레임에서는 조금더 복잡하게 사용가능
+- tips.sex.apply(lambda x: 1 if x=='Male' else 2)
+- tips[['total_bill','tip']].apply(lambda x:sum(x))
+- tips.apply(lambda x: x['total_bill']+x['tip'], axis=1)
+
+76. 포 안쓰는 기법 몇 가지?
+- 1.이터레이터 제네레이터
+
+- 2. 컴프리핸션 (포 쓰지만 포 안쓰는 거로 보기로 했어요)
+- 3. 재귀
+- 4. 맵 필터 리듀스 하이
+
+77. 어플라이 맵
+- 전체를 싹다 하나씩 적용
+
+
+78. anaconda prompt로 설치하세요
+- conda install geopandas
+- 설치가 잘 안되기에 컴퓨터 설치후 재부팅해야합니다.
+
+79. geopandas 사용하는 이유
+- 폴리엄에서 못했던 것들 여기서 사용할 수있음
+- 단, 예쁘진 않음
+
+80. geopandas 안 예쁜 이유
+- 맷플라블릿, 즉 기본적인 요소로만 그려서 안 예뻐
+
+81. %matplotlib 
+- 임포트 할떄 이거 안하면 그래프 안 그려짐
+- 옵션(inline, notebook) 2개 가능
+
+82. 인라인?
+- 박아버린다. 인터엑티브 안해
+
+83. 노트북?
+- 인터액티브해
+
+84. DASK
+- 분산처리 가능하게 하는거
+
+85. world.info()
+- 오브젝트?
+	- 이거 폴리건 다각형도 포함
+	- 즉 객체로 저장해요
+86.  판다스에서 그리는 방식 2가지
+- 1. 점(.)플랏 
+    -tips[['total_bill','tip']].plot.bar
+- 2. 
+    - tips[['total_bill','tip']].plot.(kind='bar')
+
+87. 센트로이드
+-지오판다스에서 중앙점 알려줌
+- world.centroid
+>>
+0        POINT (66.08669022192834 33.85639928169076)
+1       POINT (17.47057255231345 -12.24586903613316)
+2        POINT (20.03242643144321 41.14135330604877)
+3        POINT (54.20671476159633 23.8686336533476
+
+
+88. 위치에 대한 중앙점 찾고 칼럼으로 넣어줌 
+- 아까 폴리언은 색 입히는거만 가능했는데
+- 이제 중앙점 찾아주고 값 탁 넣어주는거 가능해짐
+
+89. 셋 지오메트리
+- 중심점 기반으로 그림 그려준대(?)
+
+90. 피오나
+- 포맷이 굉장히 다양해
+- 어떤 위치 정보데이터를 읽는가 체크해주는것
+
+91. figsize
+- 멧플라블릿 크기
+
+92. 지오 판다스 연습용 데이터 써보기 슬라이싱 가능?
+- 판다스니까 가능
+- world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres')) 
+- southern_world = world.cx[:, :]
+- southern_world.plot(figsize=(10, 3))
+
+93. CX
+- 예전에는 ix라고 해서 영역 자르는게 있었고
+- cx라고 해서 이제 센트롤. 중심부터 자른다고 한대.
+- loc, iloc처럼 지원하는게 이거래
+
+- 특정 영역 자를 수 있따 없다
+
+94. 지오판다스도 판다스처럼 조건 줘서 자를 수 있다?
+- d응
+- world = world[(world.pop_est>0) & (world.continent!="Antarctica")] 
+- world['gdp_per_cap'] = world.gdp_md_est / world.pop_est 
+- world.plot(column='gdp_per_cap')
+
+95. 브로드 캐스트 가능?
+- 응 지오판다스 가능. 위도 경도 숫자니까
+
+96. 지오판다스 지역따라 색상 입힐 수 있음?
+- 응 입힐 수 있음
+
+97. cmap?
+- color map
+- 색상 지정 가능
+- world.plot(column='gdp_per_cap', cmap='OrRd', scheme='quantiles')
+	- 오렌지로 칠하네
+98. 서울
+- seoul.plot()하면 컬럼끼리 안 구분 되어 파랗게 하나 나와
+- seoul.plot(column='name') 하면 컬럼끼리 구분시켜줌
+
+99. 전체 지도에서 서울 자를떄 쓰는거?
+ - cx
+    
+100. 단계 구분도 약점
+- 히트맵 위에 숫자 받는거 교수님 좋아하심
+- 근데 폴리언에서는 숫자 박는게 안돼
+- 허나 이 지오판다스는 영역별로 그림을/숫자를 박을 수 있고, 그 영역별로 plot도 변경 가능
+
+101. 강남구 위치 뽑기
+-seoul = gpd.read_file('asset/seoul_shp', encoding='utf8')
+- seoul.plot(column='name')
+- seoul[seoul.name=='강남구'].geometry
+
+102. representative_point?
+- 대표점. 중심점 찾기
+- seoul['coords'] = seoul['geometry'].apply(lambda x: x.representative_point().coords[:])
+- seoul['coords'] = [coords[0] for coords in seoul['coords']]
+
+103. 좌표?
+- coords라고 붙은 애
+- seoul.coords
+
+104.이터로우?
+- 언더바언더바 겟과 언더바언더바 이터가 dir에 있따면/
+    - for문 돌릴 수 있어요.
+
+105.포를 돌리는 또 다른 방법
+    - tips.it
+        - 딕셔너리는 키(.key)/밸류(.value)/키-밸류(.items)로 볼 수 있음
+        
+106.이터 삼총사
+- 이터 아이템즈 (iteritems): 딕셔너리에서 나왔던거
+	- for i in tips.items():
+		print(i)
+- 이터 로우즈 (iterrows) : 하나씩 열별로 뽑고, 이 점의 이름 찍는거
+- 이터 튜플즈 (itertuples)
+
+------
+
+107. 1)기계학습은 데이터로부터
+- 사이킷도 연습용 데이터가 있어
+    - 3종류
+        - 1.load 언더바: 크기가 작은 경우라 바로 쓸 수 있음
+        - 2.fetch 언더바: 인터넷에서 가져오는 큰 경우
+        - 3. make 언더바: 랜덤하게 데이터 가져옴
+# from sklearn.datasets import load_iris
+	- 스네이크 방식이니 함수네
+- data=load_iris()
+- type(data
+108. type(data)
+기계학습 -사이킷
+
+
+108. 랭글링 되어 가져왔다 치고 쓰자
+-  iris=pd.DataFrame(data.data)
+- #### 인덱스, 컬럼명 없으니 ㅋ러럼 숫자로 맞춰줘.
+- 우리 컬럼명 맞춰주자
+- 컬럼명은 여기서 디맨션 오케이? 혹은 피쳐
+
